@@ -36,9 +36,10 @@ public class BattleController : MonoBehaviour
                 isBeatable = true;
             }
 
-            if (Input.GetKeyDown(KeyCode.Z) && isBeatable == true)
+            if (isBeatable == true)
             {
-                database.enemyDetails[database.beatCharacterSelectionIndex].GetComponent<Character>().sceneCharacter.barCharacter.progress -= 0.5f;
+                if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.X))
+                    database.enemyDetails[database.beatCharacterSelectionIndex].GetComponent<Character>().sceneCharacter.barCharacter.progress -= 0.5f;
             }
         }
         else

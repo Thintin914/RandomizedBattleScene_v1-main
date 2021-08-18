@@ -23,6 +23,7 @@ public class TargetSelection : MonoBehaviour
 
     private void LateUpdate()
     {
+        transform.Rotate(new Vector3(0, 0, -10 * Time.deltaTime));
         if (battleMenu != null)
         {
             if (previousIndex != battleMenu.currentTarget)

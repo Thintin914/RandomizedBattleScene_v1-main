@@ -442,62 +442,71 @@ public class SceneCharacter : MonoBehaviour
                 break;
             case 1:
                 database.logMessage.AddMessage("<Option: Skill!>");
-                Debug.Log("Caster: " + database.selector + ", Skill: " + database.allyDetails[database.selector].GetComponent<Character>().skills[database.selectedItem].ID + ", Is Ally Side: " + database.isAllySelected + ", Target Index: " + database.selectedIndex);
-                switch (database.allyDetails[database.selector].GetComponent<Character>().skills[database.selectedItem].ID)
+                int tempMPCost = 0;
+                for (int i = 0; i < characterStats.skills.Count; i++)
                 {
-                    case 0:
-                        target.AddStatsEffect(2, 0, 100, 0, 0);
-                        break;
-                    case 1:
+                    if (characterStats.skills[i].ID == database.selectedItem)
+                    {
+                        tempMPCost = characterStats.skills[i].MPCost;
+                    }
+                }
+                characterStats.currentMP -= tempMPCost;
+                Debug.Log("Caster: " + database.selector + ", Skill: " + database.selectedItem + ", Is Ally Side: " + database.isAllySelected + ", Target Index: " + database.selectedIndex);
+                switch (database.selectedItem)
+                 {
+                     case 0:
                         target.AddStatsEffect(1, 0, 0, -3, 0);
                         target.AddEffect(2, Character.Element.wind);
                         break;
+                    case 1:
+                        target.AddStatsEffect(2, 0, 100, 0, 0);
+                        break;
                     case 2:
+                        target.currentHP -= getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
+                        target.AddStatsEffect(2, 0, 0, 6, 0);
+                        target.AddEffect(2, Character.Element.electricity);
+                        break;
+                     case 3:
+                         finalDamage = getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
+                         finalDamage += (int)(finalDamage * 0.05f);
+                         for (int i = 0; i < database.enemyDetails.Count; i++)
+                         {
+                             database.enemyDetails[i].GetComponent<Character>().currentHP -= finalDamage;
+                             database.enemyDetails[i].GetComponent<Character>().AddEffect(2, Character.Element.fire);
+                         }
+                         break;
+                     case 4:
                         finalDamage = getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
                         finalDamage += (int)(finalDamage * 0.15f);
                         target.currentHP -= finalDamage;
                         target.AddEffect(2, Character.Element.fire);
                         break;
-                    case 3:
-                        finalDamage = getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
-                        finalDamage += (int)(finalDamage * 0.05f);
-                        for (int i = 0; i < database.enemyDetails.Count; i++)
-                        {
-                            database.enemyDetails[i].GetComponent<Character>().currentHP -= finalDamage;
-                            database.enemyDetails[i].GetComponent<Character>().AddEffect(2, Character.Element.fire);
-                        }
-                        break;
-                    case 4:
+                    case 5:
+                         finalDamage = getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
+                         finalDamage = (int)(finalDamage * 0.7f);
+                         for (int i = 0; i < database.enemyDetails.Count; i++)
+                         {
+                             database.enemyDetails[i].GetComponent<Character>().currentHP -= finalDamage;
+                             database.enemyDetails[i].GetComponent<Character>().AddEffect(2, Character.Element.water);
+                         }
+                         break;
+                     case 6:
                         target.currentHP = target.maxHP;
                         break;
-                    case 5:
-                        finalDamage = getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
-                        finalDamage = (int)(finalDamage * 0.7f);
-                        for (int i = 0; i < database.enemyDetails.Count; i++)
-                        {
-                            database.enemyDetails[i].GetComponent<Character>().currentHP -= finalDamage;
-                            database.enemyDetails[i].GetComponent<Character>().AddEffect(2, Character.Element.water);
-                        }
-                        break;
-                    case 6:
-                        target.shieldPoint += 50;
-                        break;
                     case 7:
-                        for (int i = 0; i < database.allyDetails.Count; i++)
-                        {
-                            database.allyDetails[i].GetComponent<Character>().shieldPoint += 30;
-                        }
-                        break;
-                    case 8:
-                        target.currentHP -= getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
-                        target.AddStatsEffect(2, 0, 0, 6, 0);
-                        target.AddEffect(2, Character.Element.electricity);
-                        break;
-                    case 9:
                         characterStats.currentHP -= (int)(characterStats.currentHP * 0.9f);
                         finalDamage = getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
                         finalDamage += (int)(finalDamage * 1.5f);
                         target.AddEffect(2, Character.Element.electricity);
+                        break;
+                     case 8:
+                        target.shieldPoint += 50;
+                        break;
+                    case 9:
+                        for (int i = 0; i < database.allyDetails.Count; i++)
+                        {
+                            database.allyDetails[i].GetComponent<Character>().shieldPoint += 30;
+                        }
                         break;
                 }
                 break;

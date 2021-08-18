@@ -148,7 +148,6 @@ public class ElementEffect : MonoBehaviour
         {
             case Character.Element.fire:
                 characterStats.currentHP -= getFInalAttackDamage(10, characterStats.defense + characterStats.extraAttackDamage);
-                characterStats.AddPopText("Burn!");
                 break;
             case Character.Element.wind:
                 characterStats.extraSpeed -= 1;

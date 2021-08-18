@@ -171,7 +171,6 @@ public class SkillMenu : MonoBehaviour
             {
                 if (characterStats.currentMP >= skills[scroller].MPCost)
                 {
-                    characterStats.currentMP -= skills[scroller].MPCost;
                     battleMenu.currentItem = skills[scroller].ID;
                     battleMenu.isSelectedItem = true;
                     battleMenu.enabled = true;

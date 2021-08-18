@@ -96,6 +96,9 @@ public class CrossSceneManagement : MonoBehaviour
                     }
                 }
                 break;
+            case "TransitionalScene":
+                pointHolder.gameObject.SetActive(false);
+                break;
         }
 
         if (forcedThrowDice == true)

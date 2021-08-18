@@ -178,7 +178,7 @@ public class PointHolder : MonoBehaviour
                 {
                     if (CSM.database.allyDetails.Count > 0 && beatedLevel.Contains(currentPoint) == false)
                     {
-                        CSM.LoadScene("BattleScene");
+                        CSM.LoadScene("TransitionalScene");
                         int index = -1;
                         for (int i = 0; i < mainLevel.Length; i++)
                         {

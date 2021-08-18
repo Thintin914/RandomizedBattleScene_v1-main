@@ -267,19 +267,19 @@ public class BattleMenu : MonoBehaviour
             switch (currentItem)
             {
                 case 0:
-                    targetRange = 's';
+                    targetRange = 'e';
                     break;
                 case 1:
-                    targetRange = 'e';
+                    targetRange = 's';
                     break;
                 case 2:
-                    targetRange = 'e';
+                    targetRange = 'u';
                     break;
                 case 3:
                     targetRange = 'e';
                     break;
                 case 4:
-                    targetRange = 'a';
+                    targetRange = 'e';
                     break;
                 case 5:
                     targetRange = 'e';
@@ -288,27 +288,27 @@ public class BattleMenu : MonoBehaviour
                     targetRange = 'a';
                     break;
                 case 7:
-                    targetRange = 'a';
+                    targetRange = 'e';
                     break;
                 case 8:
-                    targetRange = 'u';
+                    targetRange = 's';
                     break;
                 case 9:
-                    targetRange = 'e';
+                    targetRange = 'a';
                     break;
             }
             switch (targetRange)
             {
-                case 's':
+                case 's': // s = self
                     isTargetAlly = true;
                     currentTarget = database.selector;
                     break;
-                case 'u':
-                case 'e':
+                case 'u': // u = both side
+                case 'e': // e = enemy
                     isTargetAlly = false;
                     currentTarget = 0;
                     break;
-                case 'a':
+                case 'a': // a = ally
                     isTargetAlly = true;
                     currentTarget = 0;
                     break;

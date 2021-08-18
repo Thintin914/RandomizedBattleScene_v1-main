@@ -209,6 +209,9 @@ public class Database : MonoBehaviour
         AddCharacterToAllyList(CharacterLibrary(0));
         AddCharacterToAllyList(CharacterLibrary(3));
         AddCharacterToAllyList(CharacterLibrary(4));
+
+        allyDetails[0].GetComponent<Character>().AddSkill(Character.Element.fire, 10, 4);
+        allyDetails[0].GetComponent<Character>().AddSkill(Character.Element.fire, 10, 3);
     }
 
     public void CreateDice()
@@ -359,7 +362,7 @@ public class Database : MonoBehaviour
         switch (index)
         {
             case 0:
-                return new Character(100, 100, 100, 100, 5, 10, Character.Element.fire, index, 0);
+                return new Character(100, 100, 100, 100, 50, 10, Character.Element.fire, index, 0);
             case 1:
                 return new Character(1, 1, 1, 1, 1, 1, Character.Element.wildfire, index, 0);
             case 2:
@@ -420,16 +423,16 @@ public class Database : MonoBehaviour
                 StartCoroutine(WaitForTotalWave(1, 1, level));
                 break;
             case 1:
-                StartCoroutine(WaitForTotalWave(1, 6, level));
+                StartCoroutine(WaitForTotalWave(1, 1, level));
                 break;
             case 2:
-                StartCoroutine(WaitForTotalWave(1, 6, level));
+                StartCoroutine(WaitForTotalWave(1, 1, level));
                 break;
             case 3:
-                StartCoroutine(WaitForTotalWave(1, 6, level));
+                StartCoroutine(WaitForTotalWave(1, 1, level));
                 break;
             default:
-                StartCoroutine(WaitForTotalWave(1, 6, level));
+                StartCoroutine(WaitForTotalWave(1, 1, level));
                 break;
         }
     }
