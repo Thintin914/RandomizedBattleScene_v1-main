@@ -27,6 +27,7 @@ public class SceneCharacter : MonoBehaviour
             animator = cloner1.GetComponent<Animator>();
             myRenderer = cloner1.GetComponent<SpriteRenderer>();
             myRenderer.sortingLayerName = "character";
+            StartCoroutine(FadeIn());
 
             GameObject cloner2 = Instantiate(gameObject);
             barCharacter = cloner2.GetComponent<SceneCharacter>();
@@ -52,6 +53,7 @@ public class SceneCharacter : MonoBehaviour
             {
                 transform.rotation = Quaternion.Euler(0, -180, 0);
             }
+
         }
         else
         {
@@ -60,6 +62,8 @@ public class SceneCharacter : MonoBehaviour
             animator = transform.GetChild(0).GetComponent<Animator>();
             myRenderer = transform.GetChild(0).GetComponent<SpriteRenderer>();
             myRenderer.sortingLayerName = "character";
+            myRenderer.color = new Color32(255, 255, 255, 255);
+
             battleMenu = GameObject.Find("BattleMenu").GetComponent<BattleMenu>();
             sceneCharacter = transform.parent.GetComponent<SceneCharacter>();
         }
@@ -91,7 +95,6 @@ public class SceneCharacter : MonoBehaviour
                             }
                             else
                             {
-                                database.logMessage.AddMessage("<Enemy Turn!>");
                                 performAttackPattern(characterStats.ID, getAttackID(characterStats.ID, repeatRate), 0, true);
                                 StartCoroutine("attack");
                             }
@@ -118,16 +121,13 @@ public class SceneCharacter : MonoBehaviour
                     HPIndicatorHolder.text = "Dead";
                     if (characterStats.isAlly == true)
                     {
-                        database.logMessage.AddMessage("Ally " + database.allyDetails.IndexOf(characterStats.gameObject) + " experienced a bloody death!");
                         database.allyDetails.Remove(characterStats.gameObject);
                         database.allyDetails.Add(characterStats.gameObject);
                         characterStats.isDead = true;
-                        myRenderer.material.shader = shaderGUIText;
-                        myRenderer.color = Color.grey;
-                        barCharacter.myRenderer.material.shader = shaderGUIText;
-                        barCharacter.myRenderer.material.shader = shaderGUIText;
+                        myRenderer.color = new Color32(255, 255, 255, 100);
+                        barCharacter.myRenderer.color = new Color32(255, 255, 255, 100);
                         barCharacter.progress = 0;
-                        barCharacter.transform.position = new Vector2(-8, 4);
+                        barCharacter.transform.position = new Vector2(-4, 4);
 
                         int deathNumber = RepositionCharacter(true);
                         if (deathNumber == database.allyDetails.Count)
@@ -153,18 +153,16 @@ public class SceneCharacter : MonoBehaviour
                             database.currentWave = 0;
                             database.waitingEnemies.Clear();
                             database.logMessage.DeleteLog();
-                            database.logMessage.AddMessage("[" + System.DateTime.UtcNow.ToString("HH:mm:ss") + "] <Battle Ended!>");
                             database.logMessage.AddMessage("All allies died!");
-                            database.logMessage.AddMessage("<Game Over!>");
                             database.logMessage.Print(LogMessage.closeStatus.backToBigMap);
                         }
                     }
                     else
                     {
-                        database.logMessage.AddMessage("Enemy " + database.enemyDetails.IndexOf(characterStats.gameObject) + " experienced a bloody death!");
+                        StartCoroutine(FadeOut());
+
                         int reward = (int)(characterStats.maxHP * 0.8f + (characterStats.defense + characterStats.dodgeRate) * 0.4f + (characterStats.speed + characterStats.attackDamage) * 1.5f);
                         database.coinGainInOneRound += reward;
-                        database.logMessage.AddMessage("You gained " + reward + " gold!");
 
                         database.enemyDetails.Remove(characterStats.gameObject);
                         characterStats.isDead = true;
@@ -209,11 +207,10 @@ public class SceneCharacter : MonoBehaviour
                                 }
                                 database.currentWave = 0;
                                 database.waitingEnemies.Clear();
-                                database.logMessage.AddMessage("[" + System.DateTime.UtcNow.ToString("HH:mm:ss") + "] <Battle Ended!>");
                                 database.logMessage.AddMessage("Current Gold: " + database.coin + " G + " + database.coinGainInOneRound + " G => " + (database.coin + database.coinGainInOneRound) + " G");
                                 database.coin = database.coin + database.coinGainInOneRound;
 
-                                if (Random.Range(1, 1) == 1)
+                                if (Random.Range(1, 3) == 1)
                                 {
                                     database.logMessage.Print(LogMessage.closeStatus.backToShop);
                                 }
@@ -229,7 +226,6 @@ public class SceneCharacter : MonoBehaviour
                         }
                         Destroy(characterStats.gameObject);
                         Destroy(HPIndicatorHolder.gameObject);
-                        Destroy(gameObject);
                     }
 
                 }
@@ -292,18 +288,18 @@ public class SceneCharacter : MonoBehaviour
     IEnumerator Flash()
     {
         myRenderer.material.shader = shaderGUIText;
-        myRenderer.color = Color.red;
-        yield return new WaitForSeconds(0.2f);
-        if (characterStats.isDead == true)
-        {
-            myRenderer.material.shader = shaderGUIText;
-            myRenderer.color = Color.grey;
+         myRenderer.color = Color.red;
+         yield return new WaitForSeconds(0.2f);
+         if (characterStats.isDead == true)
+         {
+             myRenderer.material.shader = shaderGUIText;
+             myRenderer.color = new Color32(255, 255, 255, 100);
         }
-        else
-        {
-            myRenderer.material.shader = shaderSpriteDefault;
-            myRenderer.color = Color.white;
-        }
+         else
+         {
+             myRenderer.material.shader = shaderSpriteDefault;
+             myRenderer.color = Color.white;
+         }
     }
 
     IEnumerator attack()
@@ -379,14 +375,6 @@ public class SceneCharacter : MonoBehaviour
         {
             if (Random.Range(getOverThread(target.dodgeRate, target.extraDodgeRate, 100), 100) == getOverThread(target.dodgeRate, target.extraDodgeRate, 100))
             {
-                if (target.isAlly == true)
-                {
-                    database.logMessage.AddMessage("Ally " + database.allyDetails.IndexOf(target.gameObject) + " dodged an attack!");
-                }
-                else
-                {
-                    database.logMessage.AddMessage("Enemy " + database.enemyDetails.IndexOf(target.gameObject) + " dodged an attack!");
-                }
                 isDodged = true;
                 target.AddPopText("Dodged!");
             }
@@ -422,7 +410,6 @@ public class SceneCharacter : MonoBehaviour
 
     IEnumerator WaitOption()
     {
-        database.logMessage.AddMessage("<Your Turn!>");
         database.isSelectedOption = false;
         database.selector = database.allyDetails.IndexOf(characterStats.gameObject);
         battleMenu.Show();
@@ -437,11 +424,9 @@ public class SceneCharacter : MonoBehaviour
         switch (database.selectedState)
         {
             case 0:
-                database.logMessage.AddMessage("<Option: Attack!>");
                 performAttackPattern(0, -1, database.selectedIndex, false);
                 break;
             case 1:
-                database.logMessage.AddMessage("<Option: Skill!>");
                 int tempMPCost = 0;
                 for (int i = 0; i < characterStats.skills.Count; i++)
                 {
@@ -511,29 +496,23 @@ public class SceneCharacter : MonoBehaviour
                 }
                 break;
             case 2:
-                database.logMessage.AddMessage("<Option: Item!>");
                 Debug.Log("Caster: " + database.selector + ", Item: " + database.inventory[database.selectedItem].itemName + ", Is Ally Side: " + database.isAllySelected + ", Target Index: " + database.selectedIndex);
                 switch (database.inventory[database.selectedItem].ID)
                 {
                     case 0:
-                        database.logMessage.AddMessage("Ally " + database.allyDetails.IndexOf(target.gameObject) + " used HP potion!");
                         target.currentHP = getOverThread(target.currentHP, 50, target.maxHP);
 
                         break;
                     case 1:
-                        database.logMessage.AddMessage("Ally " + database.allyDetails.IndexOf(target.gameObject) + " used MP potion!");
                         target.currentMP = getOverThread(target.currentMP, 30, target.maxHP);
                         break;
                     case 2:
-                        database.logMessage.AddMessage("Ally " + database.allyDetails.IndexOf(target.gameObject) + " used speed potion!");
                         target.AddStatsEffect(3, 0, 0, 3, 0);
                         break;
                     case 3:
-                        database.logMessage.AddMessage("Ally " + database.allyDetails.IndexOf(target.gameObject) + " used strength potion!");
                         target.AddStatsEffect(3, 0, 0, 0, 25);
                         break;
                     case 4:
-                        database.logMessage.AddMessage("Ally " + database.allyDetails.IndexOf(target.gameObject) + " used revive potion!");
                         target.isDead = false;
                         target.currentHP = getOverThread(target.currentHP, 50, target.maxHP);
                         target.sceneCharacter.isHit();
@@ -547,5 +526,27 @@ public class SceneCharacter : MonoBehaviour
                 break;
         }
         StartCoroutine("attack");
+    }
+
+    private IEnumerator FadeIn()
+    {
+        myRenderer.color = new Color32(255, 255, 255, 0);
+        for (int i = 0; i < 10; i++)
+        {
+            myRenderer.color += new Color32(0, 0, 0, 26);
+            yield return new WaitForSeconds(0.04f);
+        }
+    }
+
+    private IEnumerator FadeOut()
+    {
+        myRenderer.color = new Color32(255, 255, 255, 255);
+        for (int i = 0; i < 10; i++)
+        {
+            myRenderer.color -= new Color32(0, 0, 0, 26);
+            yield return new WaitForSeconds(0.04f);
+        }
+
+        Destroy(gameObject);
     }
 }

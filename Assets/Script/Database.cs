@@ -362,31 +362,31 @@ public class Database : MonoBehaviour
         switch (index)
         {
             case 0:
-                return new Character(100, 100, 100, 100, 50, 10, Character.Element.fire, index, 0);
+                return new Character(25, 100, 0, 0, 10, 10, Character.Element.fire, index, 0);
             case 1:
-                return new Character(1, 1, 1, 1, 1, 1, Character.Element.wildfire, index, 0);
+                return new Character(1, 1, 1, 1, 10, 1, Character.Element.fire, index, 0);
             case 2:
-                return new Character(1, 1, 1, 1, 1, 1, Character.Element.wildfire, index, 0);
+                return new Character(1, 1, 1, 1, 10, 1, Character.Element.fire, index, 0);
             case 3:
-                return new Character(1, 1, 1, 1, 1, 1, Character.Element.wildfire, index, 0);
+                return new Character(1, 1, 1, 1, 7, 1, Character.Element.fire, index, 0);
             case 4:
-                return new Character(1, 1, 1, 1, 1, 1, Character.Element.fire, index, 0);
+                return new Character(1, 1, 1, 1, 13, 1, Character.Element.fire, index, 0);
             case 5:
-                return new Character(1, 1, 1, 1, 1, 1, Character.Element.wildfire, index, 0);
+                return new Character(1, 1, 1, 1, 10, 1, Character.Element.fire, index, 0);
             case 6:
-                return new Character(1, 1, 1, 50, 10, 1, Character.Element.wildfire, index, 0);
+                return new Character(1, 1, 1, 50, 10, 1, Character.Element.fire, index, 0);
             case 7:
-                return new Character(1, 1, 1, 50, 10, 1, Character.Element.wildfire, index, 0);
+                return new Character(1, 1, 1, 50, 10, 1, Character.Element.fire, index, 0);
             case 8:
-                return new Character(1, 1, 1, 50, 10, 1, Character.Element.wildfire, index, 0);
+                return new Character(1, 1, 1, 50, 10, 1, Character.Element.fire, index, 0);
             case 9:
-                return new Character(1, 1, 1, 50, 10, 1, Character.Element.wildfire, index, 0);
+                return new Character(1, 1, 1, 50, 10, 1, Character.Element.fire, index, 0);
             case 10:
-                return new Character(1, 1, 1, 50, 10, 1, Character.Element.wildfire, index, 0);
+                return new Character(1, 1, 1, 50, 10, 1, Character.Element.fire, index, 0);
             case 11:
-                return new Character(1, 1, 1, 50, 10, 1, Character.Element.wildfire, index, 0);
+                return new Character(1, 1, 1, 50, 10, 1, Character.Element.fire, index, 0);
         }
-        return new Character(100, 100, 100, 100, 100, 100, Character.Element.wildfire, index, 0);
+        return new Character(100, 100, 100, 100, 100, 100, Character.Element.fire, index, 0);
     }
 
     private bool isFulfilledPossibility(int denominator)
@@ -408,7 +408,6 @@ public class Database : MonoBehaviour
         logMessage = Instantiate(log).GetComponent<LogMessage>();
         logMessage.DeleteLog();
         logMessage.database = this;
-        logMessage.AddMessage("[" + System.DateTime.UtcNow.ToString("HH:mm:ss") + "] <Battle Started!>");
         logMessage.AddMessage("<Determining Total Wave!>");
 
         currentWave = 0;

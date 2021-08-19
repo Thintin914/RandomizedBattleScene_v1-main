@@ -12,7 +12,7 @@ public class PointHolder : MonoBehaviour
     // Add avaliable levels in the list below. Eg. 0, 1, 2, 4, 6, 7, 10, 11, 12, 14, 17
     public List<int> avaliableLevel, beatedLevel;
     private GameObject characterIconHolder;
-    private int currentPoint = 0;
+    public int currentPoint = 0;
     public enum KeyPressed { Up, Down, Left, Right};
     private KeyPressed keyPressed = KeyPressed.Right;
     private bool isTraveling = false, isMoving = false;
@@ -121,6 +121,7 @@ public class PointHolder : MonoBehaviour
     {
         for (int i = 0; i < pointPositions.Length; i++)
         {
+            allPoints[i].sr.sprite = null;
             if (avaliableLevel.Contains(i))
             {
                 if (beatedLevel.Contains(i) == false)

@@ -67,6 +67,7 @@ public class CrossSceneManagement : MonoBehaviour
                         pointHolder.avaliableLevel.Clear();
                         pointHolder.avaliableLevel.Add(0);
                         pointHolder.beatedLevel.Clear();
+                        pointHolder.currentPoint = 0;
                     }
                     else
                     {

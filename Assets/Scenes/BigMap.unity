@@ -589,7 +589,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 1a5ac4f1937c54343b33098b7fa84c87, type: 3}
   - {fileID: 21300000, guid: 1a5ac4f1937c54343b33098b7fa84c87, type: 3}
   foregroundMap:
-  - {fileID: 21300000, guid: 3992b7dab26cb464491432d2eb7f3db7, type: 3}
+  - {fileID: 21300000, guid: a389636f9f58001449bb3bad6d03965c, type: 3}
   - {fileID: 21300000, guid: 86dfd944506ad9a4d945b3ea70735bce, type: 3}
   - {fileID: 21300000, guid: 86dfd944506ad9a4d945b3ea70735bce, type: 3}
   - {fileID: 21300000, guid: 49c5243f75b240046a507f6cd880b335, type: 3}

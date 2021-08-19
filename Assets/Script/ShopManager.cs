@@ -9,15 +9,25 @@ public class ShopManager : MonoBehaviour
     public GameObject spriteHolder;
     public List<SpriteRenderer> sr, characterExistingSkills;
     public List<TMPro.TextMeshProUGUI> price;
-    public TMPro.TextMeshProUGUI coinText, characterStatsText;
+    public TMPro.TextMeshProUGUI coinText, characterStatsText, instructionHolder;
     public List<Character.Element> existingCharacterElement;
     public List<GameObject> characterForSkill;
     private SpriteRenderer skillNotice;
     private bool isSkillLearnable = false;
+    private ShopDoorController door;
+    public bool isShopOpened = false;
 
     private void Start()
     {
-        SetUpShop(0);
+        database = GameObject.Find("Database").GetComponent<Database>();
+        coinText = Instantiate(database.instruction).GetComponent<TMPro.TextMeshProUGUI>();
+        coinText.transform.SetParent(GameObject.Find("Canvas").transform);
+        coinText.transform.position = new Vector2(-3, 4.5f);
+        coinText.fontSize = 2;
+
+        instructionHolder = Instantiate(database.instruction).GetComponent<TMPro.TextMeshProUGUI>(); ;
+        instructionHolder.transform.SetParent(GameObject.Find("Canvas").transform);
+
         for (int i = 0; i < database.allyDetails.Count; i++)
         {
             Character.Element tempElement = database.allyDetails[i].GetComponent<Character>().element;
@@ -26,169 +36,219 @@ public class ShopManager : MonoBehaviour
                 existingCharacterElement.Add(tempElement);
             }
         }
+
+        door = GameObject.Find("DoorController").GetComponent<ShopDoorController>();
+        door.SM = this;
+        door.OpenDoor(0);
     }
 
     private void Update()
     {
-        if (page == 0)
+        if (isShopOpened == true)
         {
-            maxSelectionIndex = database.itemSprites.Length;
-        }
-        else if (page == 1)
-        {
-            maxSelectionIndex = database.skillSprites.Length;
-        }
-        else if (page == 2)
-        {
-            maxSelectionIndex = characterForSkill.Count;
-        }
-
-        if (page != 2)
-        {
-            if (Input.GetKeyDown(KeyCode.W) && selectionIndex - 1 >= 0)
+            if (page == 0)
             {
-                selectionIndex--;
-                sr[selectionIndex].color = new Color32(255, 255, 255, 255);
-                sr[selectionIndex + 1].color = new Color32(170, 70, 200, 255);
-
-                SetText(page, selectionIndex, 1);
-                ScrollDown();
+                maxSelectionIndex = database.itemSprites.Length;
             }
-            if (Input.GetKeyDown(KeyCode.S) && selectionIndex + 1 < maxSelectionIndex)
+            else if (page == 1)
             {
-                selectionIndex++;
-                sr[selectionIndex].color = new Color32(255, 255, 255, 255);
-                sr[selectionIndex - 1].color = new Color32(170, 70, 200, 255);
-
-                SetText(page, selectionIndex, -1);
-                ScrollUp();
+                maxSelectionIndex = database.skillSprites.Length;
             }
-            if (Input.GetKeyDown(KeyCode.Z))
+            else if (page == 2)
             {
-                if (page == 0 && database.coin >= GetPrice(page, selectionIndex))
+                maxSelectionIndex = characterForSkill.Count;
+            }
+
+            if (page != 2)
+            {
+                if (Input.GetKeyDown(KeyCode.W) && selectionIndex - 1 >= 0)
                 {
-                    database.coin -= GetPrice(page, selectionIndex);
-                    coinText.text = "$" + database.coin.ToString();
-                    database.AddItemToInventory(database.GetItemName(selectionIndex), 1);
-                    price[selectionIndex].text = "$" + GetPrice(page, selectionIndex).ToString() + "\nx" + GetInventoryAmount(selectionIndex).ToString();
+                    selectionIndex--;
+                    sr[selectionIndex].color = new Color32(255, 255, 255, 255);
+                    sr[selectionIndex + 1].color = new Color32(170, 70, 200, 255);
+
+                    SetText(page, selectionIndex, 1);
+                    ScrollDown();
                 }
-                else if (page == 1)
+                if (Input.GetKeyDown(KeyCode.S) && selectionIndex + 1 < maxSelectionIndex)
                 {
-                    if (existingCharacterElement.Contains(database.GetSkillElement(selectionIndex)))
+                    selectionIndex++;
+                    sr[selectionIndex].color = new Color32(255, 255, 255, 255);
+                    sr[selectionIndex - 1].color = new Color32(170, 70, 200, 255);
+
+                    SetText(page, selectionIndex, -1);
+                    ScrollUp();
+                }
+                if (Input.GetKeyDown(KeyCode.Z))
+                {
+                    if (page == 0)
                     {
-                        skillNotice = Instantiate(spriteHolder).GetComponent<SpriteRenderer>();
-                        skillNotice.sprite = database.skillSprites[selectionIndex];
-                        skillNotice.transform.position = new Vector2(-5.7f, 2.6f);
-                        learnableIndex = selectionIndex;
-
-                        Character.Element tempElement = database.GetSkillElement(selectionIndex);
-                        page = 2;
-                        selectionIndex = 0;
-
-                        for (int i = 0; i < sr.Count; i++)
+                        if (database.coin >= GetPrice(page, selectionIndex))
                         {
-                            Destroy(sr[i].gameObject);
-                            Destroy(price[i].gameObject);
+                            PopText tempText = Instantiate(database.popText).GetComponent<PopText>();
+                            tempText.SetText(sr[selectionIndex].transform.position, "Bought", 0.5f);
+                            tempText.SetFloat();
+                            database.coin -= GetPrice(page, selectionIndex);
+                            coinText.text = "$" + database.coin.ToString();
+                            database.AddItemToInventory(database.GetItemName(selectionIndex), 1);
+                            price[selectionIndex].text = "$" + GetPrice(page, selectionIndex).ToString() + "\nx" + GetInventoryAmount(selectionIndex).ToString();
                         }
-                        characterForSkill.Clear();
-                        sr.Clear();
-                        price.Clear();
-
-                        for (int i = 0; i < database.allyDetails.Count; i++)
+                        else
                         {
-                            Character tempCharacter = database.allyDetails[i].GetComponent<Character>();
-                            if (tempElement == tempCharacter.element)
+                            PopText tempText = Instantiate(database.popText).GetComponent<PopText>();
+                            tempText.SetText(sr[selectionIndex].transform.position, "Insufficient Coins", 0.5f);
+                            tempText.SetFloat();
+                        }
+                    }
+                    else if (page == 1)
+                    {
+                        instructionHolder.text = "[A][D] to select character, [Z] to learn skill, [X] to cancel";
+                        if (existingCharacterElement.Contains(database.GetSkillElement(selectionIndex)))
+                        {
+                            skillNotice = Instantiate(spriteHolder).GetComponent<SpriteRenderer>();
+                            skillNotice.sprite = database.skillSprites[selectionIndex];
+                            skillNotice.transform.position = new Vector2(-5.7f, 2.6f);
+                            learnableIndex = selectionIndex;
+
+                            Character.Element tempElement = database.GetSkillElement(selectionIndex);
+                            page = 2;
+                            selectionIndex = 0;
+
+                            for (int i = 0; i < sr.Count; i++)
                             {
-                                characterForSkill.Add(Instantiate(database.characterSprites[tempCharacter.ID]));
-                                price.Add(Instantiate(database.instruction).GetComponent<TMPro.TextMeshProUGUI>());
-                                price[price.Count - 1].text = i.ToString();
-                                sr.Add(characterForSkill[characterForSkill.Count - 1].GetComponent<SpriteRenderer>());
+                                Destroy(sr[i].gameObject);
+                                Destroy(price[i].gameObject);
                             }
-                        }
-                        for (int i = 0; i < characterForSkill.Count; i++)
-                        {
-                            characterForSkill[i].transform.position = new Vector2(-8 + i * 1.5f, -3);
-                            price[i].transform.position = new Vector2(-8 + i * 1.5f, -1);
-                            price[i].transform.SetParent(GameObject.Find("Canvas").transform);
-                            price[i].alignment = TMPro.TextAlignmentOptions.Midline;
-                            sr[i].color = new Color32(170, 70, 200, 100);
-                        }
+                            characterForSkill.Clear();
+                            sr.Clear();
+                            price.Clear();
 
-                        ShowCharacterStats(0);
-                        sr[0].color = new Color32(255, 255, 255, 255);
-                        page = 2;
+                            for (int i = 0; i < database.allyDetails.Count; i++)
+                            {
+                                Character tempCharacter = database.allyDetails[i].GetComponent<Character>();
+                                if (tempElement == tempCharacter.element)
+                                {
+                                    characterForSkill.Add(Instantiate(database.characterSprites[tempCharacter.ID]));
+                                    price.Add(Instantiate(database.instruction).GetComponent<TMPro.TextMeshProUGUI>());
+                                    price[price.Count - 1].text = i.ToString();
+                                    sr.Add(characterForSkill[characterForSkill.Count - 1].GetComponent<SpriteRenderer>());
+                                }
+                            }
+                            for (int i = 0; i < characterForSkill.Count; i++)
+                            {
+                                characterForSkill[i].transform.position = new Vector2(-8 + i * 1.5f, -3);
+                                price[i].transform.position = new Vector2(-8 + i * 1.5f, -1);
+                                price[i].transform.SetParent(GameObject.Find("Canvas").transform);
+                                price[i].alignment = TMPro.TextAlignmentOptions.Midline;
+                                sr[i].color = new Color32(170, 70, 200, 100);
+                            }
+
+                            ShowCharacterStats(0);
+                            sr[0].color = new Color32(255, 255, 255, 255);
+                            page = 2;
+                        }
                     }
                 }
+                if (Input.GetKeyDown(KeyCode.A) && page - 1 >= 0)
+                {
+                    page--;
+                    SetUpShop(page);
+                }
+                if (Input.GetKeyDown(KeyCode.D) && page + 1 < 2)
+                {
+                    page++;
+                    SetUpShop(page);
+                }
+                if (Input.GetKeyDown(KeyCode.X))
+                {
+                    if (coinText != null)
+                        Destroy(coinText.gameObject);
+                    if (characterStatsText != null)
+                        Destroy(characterStatsText.gameObject);
+                    if (price.Count > 0)
+                    {
+                        for (int i = 0; i < price.Count; i++)
+                        {
+                            Destroy(price[i].gameObject);
+                        }
+                    }
+                    door.CloseDoor();
+                    enabled = false;
+                }
             }
-            if (Input.GetKeyDown(KeyCode.A) && page - 1 >= 0)
+            else // page = 2
             {
-                page--;
-                SetUpShop(page);
-            }
-            if (Input.GetKeyDown(KeyCode.D) && page + 1 < 2)
-            {
-                page++;
-                SetUpShop(page);
-            }
-            if (Input.GetKeyDown(KeyCode.X))
-            {
-                database.transform.parent.GetComponent<CrossSceneManagement>().LoadScene("BigMap");
+                if (Input.GetKeyDown(KeyCode.A) && selectionIndex - 1 >= 0)
+                {
+                    selectionIndex--;
+                    sr[selectionIndex].color = new Color32(255, 255, 255, 255);
+                    sr[selectionIndex + 1].color = new Color32(170, 70, 200, 100);
+
+                    ShowCharacterStats(int.Parse(price[selectionIndex].text));
+                }
+                if (Input.GetKeyDown(KeyCode.D) && selectionIndex + 1 < maxSelectionIndex)
+                {
+                    selectionIndex++;
+                    sr[selectionIndex].color = new Color32(255, 255, 255, 255);
+                    sr[selectionIndex - 1].color = new Color32(170, 70, 200, 100);
+
+                    ShowCharacterStats(int.Parse(price[selectionIndex].text));
+                }
+                if (Input.GetKeyDown(KeyCode.Z))
+                {
+                    if (isSkillLearnable == true)
+                    {
+                        if (database.coin >= GetPrice(1, learnableIndex))
+                        {
+                            PopText tempText = Instantiate(database.popText).GetComponent<PopText>();
+                            tempText.SetText(sr[selectionIndex].transform.position, "Learnt", 0.5f);
+                            tempText.SetFloat();
+                            int characterIndex = int.Parse(price[selectionIndex].text);
+                            database.allyDetails[characterIndex].GetComponent<Character>().AddSkill(database.GetSkillElement(learnableIndex), 10, learnableIndex);
+                            ShowCharacterStats(characterIndex);
+                            database.coin -= GetPrice(1, learnableIndex);
+                            SetTextForLearningPage(database.allyDetails[characterIndex].GetComponent<Character>());
+                        }
+                        else
+                        {
+                            PopText tempText = Instantiate(database.popText).GetComponent<PopText>();
+                            tempText.SetText(sr[selectionIndex].transform.position, "Insufficient Coins", 0.5f);
+                            tempText.SetFloat();
+                        }
+                    }
+                    else
+                    {
+                        PopText tempText = Instantiate(database.popText).GetComponent<PopText>();
+                        tempText.SetText(sr[selectionIndex].transform.position, "You've Learnt", 0.5f);
+                        tempText.SetFloat();
+                    }
+                }
+
+                if (Input.GetKeyDown(KeyCode.X))
+                {
+                    for (int i = 0; i < sr.Count; i++)
+                    {
+                        Destroy(characterForSkill[i]);
+                        Destroy(sr[i].gameObject);
+                        Destroy(price[i].gameObject);
+                    }
+                    for (int i = 0; i < characterExistingSkills.Count; i++)
+                    {
+                        Destroy(characterExistingSkills[i].gameObject);
+                    }
+
+                    Destroy(skillNotice.gameObject);
+                    Destroy(characterStatsText.gameObject);
+                    characterForSkill.Clear();
+                    sr.Clear();
+                    price.Clear();
+                    characterExistingSkills.Clear();
+                    coinText.text = "$" + database.coin.ToString();
+                    SetUpShop(1);
+                    instructionHolder.text = "[W][S] to select, [Z] to buy, [A][D] to flip, [X] to exit";
+                }
             }
         }
-        else // page = 2
-        {
-            if (Input.GetKeyDown(KeyCode.A) && selectionIndex - 1 >= 0)
-            {
-                selectionIndex--;
-                sr[selectionIndex].color = new Color32(255, 255, 255, 255);
-                sr[selectionIndex + 1].color = new Color32(170, 70, 200, 100);
-
-                ShowCharacterStats(int.Parse(price[selectionIndex].text));
-            }
-            if (Input.GetKeyDown(KeyCode.D) && selectionIndex + 1 < maxSelectionIndex)
-            {
-                selectionIndex++;
-                sr[selectionIndex].color = new Color32(255, 255, 255, 255);
-                sr[selectionIndex - 1].color = new Color32(170, 70, 200, 100);
-
-                ShowCharacterStats(int.Parse(price[selectionIndex].text));
-            }
-            if (Input.GetKeyDown(KeyCode.Z) && isSkillLearnable == true)
-            {
-                if (database.coin >= GetPrice(1, learnableIndex))
-                {
-                    int characterIndex = int.Parse(price[selectionIndex].text);
-                    database.allyDetails[characterIndex].GetComponent<Character>().AddSkill(database.GetSkillElement(learnableIndex), 10, learnableIndex);
-                    ShowCharacterStats(characterIndex);
-                    database.coin -= GetPrice(1, learnableIndex);
-                    SetTextForLearningPage(database.allyDetails[characterIndex].GetComponent<Character>());
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.X))
-            {
-                for (int i = 0; i < sr.Count; i++)
-                {
-                    Destroy(characterForSkill[i]);
-                    Destroy(sr[i].gameObject);
-                    Destroy(price[i].gameObject);
-                }
-                for (int i = 0; i < characterExistingSkills.Count; i++)
-                {
-                    Destroy(characterExistingSkills[i].gameObject);
-                }
-
-                Destroy(skillNotice.gameObject);
-                Destroy(characterStatsText.gameObject);
-                characterForSkill.Clear();
-                sr.Clear();
-                price.Clear();
-                characterExistingSkills.Clear();
-                coinText.text = "$" + database.coin.ToString();
-                SetUpShop(1);
-            }
-        }
-
     }
 
     public void SetTextForLearningPage(Character characterStats)
@@ -305,6 +365,22 @@ public class ShopManager : MonoBehaviour
             {
                 sr[i].transform.position = (Vector2)sr[i].transform.position + new Vector2(0, 1.5f);
                 price[i].transform.position = (Vector2)price[i].transform.position + new Vector2(0, 1.5f);
+                if (price[i].transform.position.y >= 6)
+                {
+                    sr[i].enabled = false;
+                    price[i].enabled = false;
+                }
+                else if (price[i].transform.position.y <= -6)
+                {
+                    sr[i].enabled = false;
+                    price[i].enabled = false;
+                }
+                else
+                {
+                    sr[i].enabled = true;
+                    price[i].enabled = true;
+                }
+
             }
         }
     }
@@ -317,6 +393,21 @@ public class ShopManager : MonoBehaviour
             {
                 sr[i].transform.position = (Vector2)sr[i].transform.position + new Vector2(0, -1.5f);
                 price[i].transform.position = (Vector2)price[i].transform.position + new Vector2(0, -1.5f);
+                if (price[i].transform.position.y >= 6)
+                {
+                    sr[i].enabled = false;
+                    price[i].enabled = false;
+                }
+                else if (price[i].transform.position.y <= -6)
+                {
+                    sr[i].enabled = false;
+                    price[i].enabled = false;
+                }
+                else
+                {
+                    sr[i].enabled = true;
+                    price[i].enabled = true;
+                }
             }
         }
     }
@@ -396,15 +487,6 @@ public class ShopManager : MonoBehaviour
             sr.Clear();
             price.Clear();
         }
-        if (database == null)
-        {
-            database = GameObject.Find("Database").GetComponent<Database>();
-            coinText = Instantiate(database.instruction).GetComponent<TMPro.TextMeshProUGUI>();
-            coinText.text = "Total: " + database.coin.ToString();
-            coinText.transform.SetParent(GameObject.Find("Canvas").transform);
-            coinText.transform.position = new Vector2(-3, 4.5f);
-            coinText.fontSize = 2;
-        }
 
         if (page == 0)
         {
@@ -449,6 +531,8 @@ public class ShopManager : MonoBehaviour
                     price.Add(tempPrice);
                     SetText(page, i, 0);
                 }
+                ScrollUp();
+                ScrollDown();
                 break;
         }
 

@@ -76,10 +76,7 @@ public class Character : MonoBehaviour
             finalDamage = 1;
         }
         currentHP -= finalDamage;
-        if (isAlly == true)
-            database.logMessage.AddMessage("Ally " + database.allyDetails.IndexOf(gameObject) + " is under attack!");
-        else
-            database.logMessage.AddMessage("Enemy " + database.enemyDetails.IndexOf(gameObject) + " is under attack!");
+        
         AddPopText(finalDamage.ToString());
     }
 
