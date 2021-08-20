@@ -59,6 +59,20 @@ public class Database : MonoBehaviour
         }
     }
 
+    public void CreateEnemy(Character characterStats)
+    {
+        characterStats.wave = currentWave;
+        AddCharacterToEnemyList(characterStats);
+
+        GameObject cloner = Instantiate(sceneCharacter, new Vector2(2 + (enemyDetails.Count - 1) * 2.5f, -2), Quaternion.identity);
+        SceneCharacter temp = cloner.GetComponent<SceneCharacter>();
+        temp.characterStats = enemyDetails[enemyDetails.Count - 1].GetComponent<Character>();
+        temp.database = this;
+        temp.isBarCharacter = false;
+        enemyDetails[enemyDetails.Count - 1].GetComponent<Character>().sceneCharacter = temp;
+        cloner.tag = "Enemy";
+    }
+
     public void CreateEnemy()
     {
         int t = 0;
@@ -204,14 +218,9 @@ public class Database : MonoBehaviour
 
     public void SetUp()
     {
-        coin = 1000;
+        coin = 0;
 
         AddCharacterToAllyList(CharacterLibrary(0));
-        AddCharacterToAllyList(CharacterLibrary(3));
-        AddCharacterToAllyList(CharacterLibrary(4));
-
-        allyDetails[0].GetComponent<Character>().AddSkill(Character.Element.fire, 10, 4);
-        allyDetails[0].GetComponent<Character>().AddSkill(Character.Element.fire, 10, 3);
     }
 
     public void CreateDice()
@@ -230,10 +239,10 @@ public class Database : MonoBehaviour
     }
 
 
-    private IEnumerator WaitForTotalWave(int minWave, int maxWave, int level)
+    private IEnumerator WaitForTotalWave(int minWave, int maxWave, int level, int minEnemy, int maxEnemy)
     {
         CreateDice();
-        diceHolder.ThrowDice(minWave, maxWave);
+        diceHolder.ThrowDice(minWave - 1, maxWave);
         yield return new WaitUntil(() => diceHolder.isDicingComplete == true);
         totalWave = diceHolder.diceNumber;
         Destroy(diceHolder.textHolder.gameObject);
@@ -242,7 +251,8 @@ public class Database : MonoBehaviour
 
         for (int i = 0; i < totalWave; i++)
         {
-            int enemyNumber = Random.Range(1, 4);
+
+            int enemyNumber = Random.Range(minEnemy, maxEnemy + 1);
             for (int j = 0; j < enemyNumber; j++)
             {
                 Character tempCharacter = CharacterLibrary(GetPossibleEnemyInLevel(level));
@@ -263,11 +273,11 @@ public class Database : MonoBehaviour
     {
         CreateDice();
         logMessage.AddMessage("<Determining Ally Character Gain!>");
-        diceHolder.ThrowDice(1, 5);
+        diceHolder.ThrowDice(1, 4);
         yield return new WaitUntil(() => diceHolder.isDicingComplete == true);
         diceHolder.isDicingComplete = false;
         int tempDiceNumber = diceHolder.diceNumber;
-        if (tempDiceNumber != 5)
+        if (tempDiceNumber != 4)
         {
             TMPro.TextMeshProUGUI tempInstruction = Instantiate(instruction).GetComponent<TMPro.TextMeshProUGUI>();
             tempInstruction.text = "[Z] to continue";
@@ -326,67 +336,83 @@ public class Database : MonoBehaviour
             case 0:
                 if (isFulfilledPossibility(2))
                 {
+                    return 1;
+                }
+                if (isFulfilledPossibility(2))
+                {
                     return 2;
                 }
-                if (isFulfilledPossibility(6))
+                break;
+            case 1:
+                if (isFulfilledPossibility(3))
                 {
-                    return 6;
+                    return 2;
                 }
-                if (isFulfilledPossibility(7))
-                {
-                    return 7;
-                }
-                if (isFulfilledPossibility(8))
+                if (isFulfilledPossibility(2))
                 {
                     return 8;
                 }
-                if (isFulfilledPossibility(9))
+                break;
+            case 2:
+                if (isFulfilledPossibility(1))
                 {
-                    return 9;
-                }
-                if (isFulfilledPossibility(10))
-                {
-                    return 10;
-                }
-                if (isFulfilledPossibility(11))
-                {
-                    return 11;
+                    return 8; // Knights
                 }
                 break;
         }
         return 1;
     }
 
-    private Character CharacterLibrary(int index) // Set All Character Statisics
+    public Character CharacterLibrary(int index) // Set All Character Statisics
     {
         switch (index)
         {
-            case 0:
-                return new Character(100, 100, 0, 0, 100, 10, Character.Element.fire, index, 0);
-            case 1:
-                return new Character(1, 1, 1, 1, 10, 1, Character.Element.fire, index, 0);
+            case 0: // HP, MP, Defense, Dodge Rate, Speed, Attack Damage, Element
+                return new Character(100, 30, 7, 10, 10, 20, GetRandomElement(), index, 0);
+            case 1: // Base Enemy
+                return new Character(20, 0, 1, 10, 5, 11, GetRandomElement(), index, 0);
             case 2:
-                return new Character(1, 1, 1, 1, 10, 1, Character.Element.fire, index, 0);
+                return new Character(55, 0, 5, 10, 4, 24, GetRandomElement(), index, 0);
             case 3:
-                return new Character(1, 1, 1, 1, 7, 1, Character.Element.fire, index, 0);
-            case 4:
-                return new Character(1, 1, 1, 1, 13, 1, Character.Element.fire, index, 0);
+                return new Character(130, 20, 9, 10, 8, 15, GetRandomElement(), index, 0);
+            case 4: // Have More Default Skills
+                return new Character(80, 60, 5, 10, 15, 5, GetRandomElement(), index, 0);
             case 5:
-                return new Character(1, 1, 1, 1, 10, 1, Character.Element.fire, index, 0);
+                return new Character(70, 70, 4, 10, 5, 50, GetRandomElement(), index, 0);
             case 6:
-                return new Character(1, 1, 1, 50, 10, 1, Character.Element.fire, index, 0);
+                return new Character(100, 0, 4, 10, 11, 0, GetRandomElement(), index, 0);
             case 7:
-                return new Character(1, 1, 1, 50, 10, 1, Character.Element.fire, index, 0);
+                return new Character(25, 0, 2, 10, 30, 9, GetRandomElement(), index, 0);
             case 8:
-                return new Character(1, 1, 1, 50, 10, 1, Character.Element.fire, index, 0);
+                return new Character(30, 0, 5, 10, 10, 16, GetRandomElement(), index, 0);
             case 9:
-                return new Character(1, 1, 1, 50, 10, 1, Character.Element.fire, index, 0);
+                return new Character(35, 0, 10, 10, 10, 26, GetRandomElement(), index, 0);
             case 10:
-                return new Character(1, 1, 1, 50, 10, 1, Character.Element.fire, index, 0);
+                return new Character(35, 0, 10, 10, 10, 26, GetRandomElement(), index, 0);
             case 11:
-                return new Character(1, 1, 1, 50, 10, 1, Character.Element.fire, index, 0);
+                return new Character(35, 0, 10, 10, 10, 26, GetRandomElement(), index, 0);
         }
-        return new Character(100, 100, 100, 100, 100, 100, Character.Element.fire, index, 0);
+        return new Character(100, 100, 100, 100, 100, 100, GetRandomElement(), index, 0);
+    }
+
+    private Character.Element GetRandomElement()
+    {
+        int randomIndex = Random.Range(0, 5);
+
+        switch (randomIndex)
+        {
+            case 0:
+                return Character.Element.fire;
+            case 1:
+                return Character.Element.water;
+            case 2:
+                return Character.Element.wind;
+            case 3:
+                return Character.Element.earth;
+            case 4:
+                return Character.Element.electricity;
+        }
+        return Character.Element.none;
     }
 
     private bool isFulfilledPossibility(int denominator)
@@ -414,24 +440,46 @@ public class Database : MonoBehaviour
         coinGainInOneRound = 0;
         targetIconHolder = Instantiate(targetIcon).GetComponent<TargetSelection>();
         targetIconHolder.database = this;
+        beatCharacterSelectionIndex = 0;
 
         CreateMap(level);
         switch (level)
         {
             case 0:
-                StartCoroutine(WaitForTotalWave(1, 1, level));
+                StartCoroutine(WaitForTotalWave(2, 3, level, 2, 3)); // min , max
                 break;
             case 1:
-                StartCoroutine(WaitForTotalWave(1, 1, level));
+                StartCoroutine(WaitForTotalWave(2, 3, level, 2, 3));
                 break;
             case 2:
-                StartCoroutine(WaitForTotalWave(1, 1, level));
+                StartCoroutine(WaitForTotalWave(1, 1, level, 1, 1));
                 break;
             case 3:
-                StartCoroutine(WaitForTotalWave(1, 1, level));
+                StartCoroutine(WaitForTotalWave(1, 4, level, 1, 4));
+                break;
+            case 4:
+                StartCoroutine(WaitForTotalWave(2, 3, level, 1, 4));
+                break;
+            case 5:
+                StartCoroutine(WaitForTotalWave(2, 4, level, 2, 4));
+                break;
+            case 6:
+                StartCoroutine(WaitForTotalWave(2, 6, level, 1, 4));
+                break;
+            case 7:
+                StartCoroutine(WaitForTotalWave(1, 1, level, 1, 1));
+                break;
+            case 8:
+                StartCoroutine(WaitForTotalWave(1, 1, level, 1, 1));
+                break;
+            case 9:
+                StartCoroutine(WaitForTotalWave(1, 5, level, 1, 4));
+                break;
+            case 10:
+                StartCoroutine(WaitForTotalWave(2, 3, level, 1, 3));
                 break;
             default:
-                StartCoroutine(WaitForTotalWave(1, 1, level));
+                StartCoroutine(WaitForTotalWave(1, 1, level, 1, 3));
                 break;
         }
     }

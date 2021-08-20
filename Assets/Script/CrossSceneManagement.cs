@@ -50,8 +50,9 @@ public class CrossSceneManagement : MonoBehaviour
 
     public void LoadScene(string sceneName) // Load Scene First
     {
+        
         previousSceneName = SceneManager.GetActiveScene().name;
-        /*
+        
         if (previousSceneName == "BattleScene" && previousBattleSceneLevel == 8)
         {
             SceneManager.LoadScene("Ending");
@@ -60,8 +61,8 @@ public class CrossSceneManagement : MonoBehaviour
         {
             SceneManager.LoadScene(sceneName);
         }
-        */
-        SceneManager.LoadScene("Ending");
+        
+        //SceneManager.LoadScene("Ending");
     }
 
     public void SetObjectActivation(string sceneName)

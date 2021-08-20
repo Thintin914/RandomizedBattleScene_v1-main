@@ -16,6 +16,7 @@ public class ShopManager : MonoBehaviour
     private bool isSkillLearnable = false;
     private ShopDoorController door;
     public bool isShopOpened = false;
+    public List<int> fixedRandomSkillPrices;
 
     private void Start()
     {
@@ -35,6 +36,12 @@ public class ShopManager : MonoBehaviour
             {
                 existingCharacterElement.Add(tempElement);
             }
+        }
+
+        fixedRandomSkillPrices.Clear();
+        for (int i = 0; i < database.skillSprites.Length; i++)
+        {
+            fixedRandomSkillPrices.Add(Random.Range(150, 400));
         }
 
         door = GameObject.Find("DoorController").GetComponent<ShopDoorController>();
@@ -419,43 +426,21 @@ public class ShopManager : MonoBehaviour
         {
             switch (index)
             {
-                case 0:
+                case 0: // HP Potion
                     return 100;
-                case 1:
+                case 1: // HP Potion
                     return 70;
-                case 2:
+                case 2: // Speed Potion
                     return 125;
-                case 3:
+                case 3: // Strength Potion
                     return 150;
-                case 4:
+                case 4: // Revive Potion
                     return 300;
             }
         }
         else if (page == 1)
         {
-            switch (index)
-            {
-                case 0:
-                    return 100;
-                case 1:
-                    return 70;
-                case 2:
-                    return 125;
-                case 3:
-                    return 150;
-                case 4:
-                    return 300;
-                case 5:
-                    return 100;
-                case 6:
-                    return 70;
-                case 7:
-                    return 125;
-                case 8:
-                    return 150;
-                case 9:
-                    return 150;
-            }
+            return fixedRandomSkillPrices[index];
         }
         return 0;
     }
@@ -512,6 +497,7 @@ public class ShopManager : MonoBehaviour
                     TMPro.TextMeshProUGUI tempPrice = Instantiate(database.instruction).GetComponent<TMPro.TextMeshProUGUI>();
                     tempPrice.transform.position = new Vector2(1.3f, selectionIndex * 1.5f + i * -1.5f);
                     tempPrice.transform.SetParent(GameObject.Find("Canvas").transform);
+                    tempPrice.fontSize = 2;
                     price.Add(tempPrice);
                     SetText(page, i, 0);
                 }
@@ -526,8 +512,9 @@ public class ShopManager : MonoBehaviour
                     sr.Add(tempSR);
 
                     TMPro.TextMeshProUGUI tempPrice = Instantiate(database.instruction).GetComponent<TMPro.TextMeshProUGUI>();
-                    tempPrice.transform.position = new Vector2(1.3f, selectionIndex * 1.5f + i * -1.5f);
+                    tempPrice.transform.position = new Vector2(0, selectionIndex * 1.5f + i * -1.5f);
                     tempPrice.transform.SetParent(GameObject.Find("Canvas").transform);
+                    tempPrice.fontSize = 2;
                     price.Add(tempPrice);
                     SetText(page, i, 0);
                 }

@@ -5,53 +5,80 @@ using UnityEngine;
 public class BattleController : MonoBehaviour
 {
     public Database database;
-    public bool isBeatable = true;
+    private TMPro.TextMeshProUGUI textHolder;
+    public int beatingCharacterIndex = -1;
+    public Character beatingCharacter;
+    private bool isTargetIconHiding = false, isHidingCalled = false;
 
-    private void Awake()
+    private void Start()
     {
         database = GameObject.Find("Database").GetComponent<Database>();
+        textHolder = Instantiate(database.instruction).GetComponent<TMPro.TextMeshProUGUI>();
+        textHolder.transform.SetParent(GameObject.Find("Canvas").transform);
+        textHolder.text = null;
     }
 
     void Update()
     {
-        if (isBeatable == true)
+        if (database.enemyDetails.Count - 1 < database.beatCharacterSelectionIndex)
         {
-            if (Input.GetKeyDown(KeyCode.A) && database.beatCharacterSelectionIndex - 1 >= 0)
+            database.beatCharacterSelectionIndex = database.enemyDetails.Count - 1;
+            if (database.beatCharacterSelectionIndex < 0)
             {
-                database.beatCharacterSelectionIndex--;
+                database.beatCharacterSelectionIndex = 0;
             }
-
-            if (Input.GetKeyDown(KeyCode.D) && database.beatCharacterSelectionIndex + 1 < database.enemyDetails.Count)
+        }
+        if (isTargetIconHiding == true)
+        {
+            if (isHidingCalled == false)
             {
-                database.beatCharacterSelectionIndex++;
-            }
-
-            if (database.isHandling == true)
-            {
-                isBeatable = false;
+                isHidingCalled = true;
                 database.targetIconHolder.Hide();
-            }
-            else
-            {
-                isBeatable = true;
-            }
-
-            if (isBeatable == true)
-            {
-                if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.X))
-                    database.enemyDetails[database.beatCharacterSelectionIndex].GetComponent<Character>().sceneCharacter.barCharacter.progress -= 0.5f;
+                beatingCharacterIndex = -1;
             }
         }
         else
         {
-            database.targetIconHolder.transform.position = new Vector2(2, -2);
-            if (database.isHandling == false && database.enemyDetails.Count > 0)
+            if (isHidingCalled == true)
             {
-                isBeatable = true;
-                database.beatCharacterSelectionIndex = 0;
+                isHidingCalled = false;
                 database.targetIconHolder.Show();
             }
+        }
 
+        if (database.isHandling == false)
+        {
+            if (database.enemyDetails.Count > 1)
+            {
+                textHolder.text = "[A][D] to select stopping enemy";
+                isTargetIconHiding = false;
+                if (Input.GetKeyDown(KeyCode.A) && database.beatCharacterSelectionIndex - 1 >= 0)
+                {
+                    database.beatCharacterSelectionIndex--;
+                }
+
+                if (Input.GetKeyDown(KeyCode.D) && database.beatCharacterSelectionIndex + 1 < database.enemyDetails.Count)
+                {
+                    database.beatCharacterSelectionIndex++;
+                }
+
+                if (beatingCharacterIndex != database.beatCharacterSelectionIndex)
+                {
+                    beatingCharacterIndex = database.beatCharacterSelectionIndex;
+                    beatingCharacter = database.enemyDetails[database.beatCharacterSelectionIndex].GetComponent<Character>();
+                }
+                if (beatingCharacter != null)
+                    beatingCharacter.sceneCharacter.barCharacter.progress -= (beatingCharacter.speed + beatingCharacter.extraSpeed) * Time.deltaTime;
+            }
+            else
+            {
+                isTargetIconHiding = true;
+                textHolder.text = null;
+            }
+        }
+        else
+        {
+            textHolder.text = null;
         }
     }
 

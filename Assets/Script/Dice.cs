@@ -23,7 +23,7 @@ public class Dice : MonoBehaviour
 
     private void CreateText()
     {
-        if (textHolder == null)
+        if (textHolder == null && database != null)
         {
             textHolder = Instantiate(database.instruction, transform.position, Quaternion.identity).GetComponent<TMPro.TextMeshProUGUI>();
             textHolder.transform.SetParent(canvasTransform);

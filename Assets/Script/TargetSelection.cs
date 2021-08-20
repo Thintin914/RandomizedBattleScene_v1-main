@@ -7,25 +7,35 @@ public class TargetSelection : MonoBehaviour
     public BattleMenu battleMenu;
     private int previousIndex = 0;
     private SpriteRenderer sr;
-    private Sprite sp;
+    private Sprite currentSprite;
     public Database database;
+    public Sprite targetIcon, lightIcon;
 
     private void Start()
     {
-        if (battleMenu != null)
+        sr = GetComponent<SpriteRenderer>();
+
+        if (database == null)
         {
+            sr.sprite = targetIcon;
             transform.position = GetPositionFromBattleMenu(battleMenu.isTargetAlly, battleMenu.currentTarget);
         }
+        else
+        {
+            sr.sprite = lightIcon;
+            transform.localScale = new Vector3(1, 0.8f, 1);
+            transform.position = new Vector2(2, 0.75f);
+            sr.color = new Color32(255, 255, 255, 120);
+        }
 
-        sr = GetComponent<SpriteRenderer>();
-        sp = sr.sprite;
+        currentSprite = sr.sprite;
     }
 
     private void LateUpdate()
     {
-        transform.Rotate(new Vector3(0, 0, -10 * Time.deltaTime));
         if (battleMenu != null)
         {
+            transform.Rotate(new Vector3(0, 0, -10 * Time.deltaTime));
             if (previousIndex != battleMenu.currentTarget)
             {
                 transform.position = GetPositionFromBattleMenu(battleMenu.isTargetAlly, battleMenu.currentTarget);
@@ -48,18 +58,18 @@ public class TargetSelection : MonoBehaviour
         previousIndex = index;
         if (isAlly)
         {
-            return battleMenu.database.allyDetails[index].GetComponent<Character>().sceneCharacter.transform.position;
+            return new Vector2(-2 + index * -2.5f, -2);
         }
         else
         {
-            return battleMenu.database.enemyDetails[index].GetComponent<Character>().sceneCharacter.transform.position;
+            return new Vector2(2 + index * 2.5f, -2);
         }
     }
 
     public Vector2 GetPositionFromDatabase (int index)
     {
         previousIndex = index;
-        return database.enemyDetails[index].GetComponent<Character>().sceneCharacter.transform.position;
+        return new Vector2(2 + index * 2.5f, 0.75f);
     }
 
     public void Hide()
@@ -70,7 +80,7 @@ public class TargetSelection : MonoBehaviour
 
     public void Show()
     {
-        sr.sprite = sp;
+        sr.sprite = currentSprite;
         enabled = true;
     }
 }

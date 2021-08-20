@@ -50,31 +50,39 @@ public class ElementEffect : MonoBehaviour
         this.element = element;
         this.characterStats = characterStats;
         sr = GetComponent<SpriteRenderer>();
+        bool isMixed = false;
 
         for (int i = 0; i < characterStats.effects.Count; i++)
         {
             ElementEffect tempElememt = characterStats.effects[i].GetComponent<ElementEffect>();
             if (getMixableElement(element, tempElememt.element) != Character.Element.none)
             {
+                isMixed = true;
                 this.element = getMixableElement(element, tempElememt.element);
                 tempElememt.isDeleted = true;
                 tempElememt.isDeleteUp = true;
                 tempElememt.StartCoroutine("SlideDelete");
             }
-            else if (tempElememt.element == element)
+        }
+        if (isMixed == false)
+        {
+            for (int i = 0; i < characterStats.effects.Count; i++)
             {
-                this.round = tempElememt.round + round;
-                extraAttackDamage = tempElememt.extraAttackDamage;
-                extraDefense = tempElememt.extraDefense;
-                extraDodgeRate = tempElememt.extraDodgeRate;
-                extraSpeed = tempElememt.extraSpeed;
-                characterStats.extraAttackDamage -= extraAttackDamage;
-                characterStats.extraDefense -= extraDefense;
-                characterStats.extraDodgeRate -= extraDodgeRate;
-                characterStats.extraSpeed -= extraSpeed;
-                tempElememt.isDeleted = true;
-                tempElememt.isDeleteUp = true;
-                tempElememt.StartCoroutine("SlideDelete");
+                ElementEffect tempElememt = characterStats.effects[i].GetComponent<ElementEffect>();
+
+                if (tempElememt.element == element)
+                {
+                    this.round = tempElememt.round + round;
+
+                    characterStats.extraAttackDamage -= extraAttackDamage;
+                    characterStats.extraDefense -= extraDefense;
+                    characterStats.extraDodgeRate -= extraDodgeRate;
+                    characterStats.extraSpeed -= extraSpeed;
+
+                    tempElememt.isDeleted = true;
+                    tempElememt.isDeleteUp = true;
+                    tempElememt.StartCoroutine("SlideDelete");
+                }
             }
         }
 
@@ -115,6 +123,8 @@ public class ElementEffect : MonoBehaviour
 
     public Character.Element getMixableElement(Character.Element currentElement, Character.Element existingElement)
     {
+        Debug.Log(currentElement + " " + existingElement);
+
         if (currentElement == Character.Element.earth && existingElement == Character.Element.fire || currentElement == Character.Element.fire && existingElement == Character.Element.earth)
             return Character.Element.stone;
         if (currentElement == Character.Element.water && existingElement == Character.Element.electricity || currentElement == Character.Element.water && existingElement == Character.Element.electricity)
@@ -131,15 +141,10 @@ public class ElementEffect : MonoBehaviour
 
     }
 
-    public int getFInalAttackDamage(int attackDamage, int denfense)
+    public int getFInalAttackDamage(int attackDamage)
     {
-        if (attackDamage - denfense <= 0)
-        {
-            characterStats.AddPopText("1");
-            return 1;
-        }
-        characterStats.AddPopText((attackDamage - denfense).ToString());
-        return attackDamage - denfense;
+        characterStats.AddPopText(attackDamage.ToString());
+        return attackDamage;
     }
 
     public void executeEffects()
@@ -147,11 +152,11 @@ public class ElementEffect : MonoBehaviour
         switch (element)
         {
             case Character.Element.fire:
-                characterStats.currentHP -= getFInalAttackDamage(10, characterStats.defense + characterStats.extraAttackDamage);
+                characterStats.currentHP -= getFInalAttackDamage(Random.Range(6, 9));
                 break;
             case Character.Element.wind:
-                characterStats.extraSpeed -= 1;
-                extraSpeed -= 1;
+                characterStats.extraSpeed -= 2;
+                extraSpeed -= 2;
                 characterStats.AddPopText("- Speed");
                 break;
             case Character.Element.water:
@@ -169,28 +174,15 @@ public class ElementEffect : MonoBehaviour
                 {
                     if (characterStats.effects[i].GetComponent<ElementEffect>().element == Character.Element.water)
                     {
-                        characterStats.currentHP -= getFInalAttackDamage(30, characterStats.defense + characterStats.extraAttackDamage);
+                        characterStats.currentHP -= getFInalAttackDamage(Random.Range(7, 11));
                     }
                 }
                 break;
             case Character.Element.rain:
                 characterStats.extraDodgeRate -= 5;
-                characterStats.currentHP -= getFInalAttackDamage(10, characterStats.defense + characterStats.extraDefense);
+                extraDodgeRate -= 5;
+                characterStats.currentHP -= getFInalAttackDamage(Random.Range(2, 8));
                 characterStats.AddPopText("Rain!");
-                if (characterStats.isAlly == true)
-                {
-                    for (int i = 0; i < characterStats.sceneCharacter.database.allyDetails.Count; i++)
-                    {
-                        characterStats.sceneCharacter.database.allyDetails[i].GetComponent<Character>().AddEffect(1, Character.Element.water);
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < characterStats.sceneCharacter.database.enemyDetails.Count; i++)
-                    {
-                        characterStats.sceneCharacter.database.enemyDetails[i].GetComponent<Character>().AddEffect(1, Character.Element.water);
-                    }
-                }
                 break;
             case Character.Element.ice:
                 characterStats.extraSpeed -= 4;
@@ -198,7 +190,7 @@ public class ElementEffect : MonoBehaviour
                 characterStats.AddPopText("Slowed!");
                 break;
             case Character.Element.stone:
-                characterStats.sceneCharacter.barCharacter.progress = -10 * round;
+                characterStats.sceneCharacter.barCharacter.progress = -5 * round;
                 round = 0;
                 roundIndicatorHolder.text = "0";
                 characterStats.AddPopText("Rooted!");
@@ -223,8 +215,9 @@ public class ElementEffect : MonoBehaviour
             case Character.Element.chaos:
                 if (round >= 2)
                 {
-                    round -= 2;
-                    characterStats.currentHP -= getFInalAttackDamage(30, characterStats.defense + characterStats.extraAttackDamage);
+                    round = 0;
+                    roundIndicatorHolder.text = "0";
+                    characterStats.currentHP -= getFInalAttackDamage(Random.Range(10, 16));
                     characterStats.AddPopText("Collapse!");
                 }
                 break;
