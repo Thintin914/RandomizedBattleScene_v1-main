@@ -296,6 +296,7 @@ MonoBehaviour:
     type: 3}
   avaliableLevel: 
   beatedLevel: 
+  currentPoint: 0
 --- !u!4 &20608427
 Transform:
   m_ObjectHideFlags: 0

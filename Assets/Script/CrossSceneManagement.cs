@@ -51,7 +51,17 @@ public class CrossSceneManagement : MonoBehaviour
     public void LoadScene(string sceneName) // Load Scene First
     {
         previousSceneName = SceneManager.GetActiveScene().name;
-        SceneManager.LoadScene(sceneName);
+        /*
+        if (previousSceneName == "BattleScene" && previousBattleSceneLevel == 8)
+        {
+            SceneManager.LoadScene("Ending");
+        }
+        else
+        {
+            SceneManager.LoadScene(sceneName);
+        }
+        */
+        SceneManager.LoadScene("Ending");
     }
 
     public void SetObjectActivation(string sceneName)
@@ -98,6 +108,9 @@ public class CrossSceneManagement : MonoBehaviour
                 }
                 break;
             case "TransitionalScene":
+                pointHolder.gameObject.SetActive(false);
+                break;
+            case "Ending":
                 pointHolder.gameObject.SetActive(false);
                 break;
         }

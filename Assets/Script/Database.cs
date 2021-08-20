@@ -362,7 +362,7 @@ public class Database : MonoBehaviour
         switch (index)
         {
             case 0:
-                return new Character(25, 100, 0, 0, 10, 10, Character.Element.fire, index, 0);
+                return new Character(100, 100, 0, 0, 100, 10, Character.Element.fire, index, 0);
             case 1:
                 return new Character(1, 1, 1, 1, 10, 1, Character.Element.fire, index, 0);
             case 2:
