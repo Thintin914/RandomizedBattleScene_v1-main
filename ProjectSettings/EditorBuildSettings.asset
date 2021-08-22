@@ -20,4 +20,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Ending.unity
     guid: ec8e449eb7a27f041a9d2a671bcb8110
+  - enabled: 1
+    path: Assets/Scenes/Opening.unity
+    guid: b02e1468013f0b94a81dc6af9c65afd4
+  - enabled: 1
+    path: Assets/Scenes/SelectInitialCharacter.unity
+    guid: 368413af901d67f42903f9ab510ceef8
   m_configObjects: {}

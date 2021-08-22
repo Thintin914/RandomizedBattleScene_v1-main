@@ -27,6 +27,12 @@ public class BattleController : MonoBehaviour
             {
                 database.beatCharacterSelectionIndex = 0;
             }
+            else
+            {
+                beatingCharacterIndex = database.beatCharacterSelectionIndex;
+                beatingCharacter = database.enemyDetails[database.beatCharacterSelectionIndex].GetComponent<Character>();
+
+            }
         }
         if (isTargetIconHiding == true)
         {
@@ -69,6 +75,8 @@ public class BattleController : MonoBehaviour
                 }
                 if (beatingCharacter != null)
                     beatingCharacter.sceneCharacter.barCharacter.progress -= (beatingCharacter.speed + beatingCharacter.extraSpeed) * Time.deltaTime;
+                else
+                    beatingCharacterIndex = -1;
             }
             else
             {

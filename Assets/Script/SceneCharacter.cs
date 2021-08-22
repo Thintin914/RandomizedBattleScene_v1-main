@@ -177,7 +177,8 @@ public class SceneCharacter : MonoBehaviour
                             database.waitingEnemies.Clear();
                             database.logMessage.DeleteLog();
                             database.logMessage.AddMessage("All allies died!");
-                            database.logMessage.Print(LogMessage.closeStatus.backToBigMap);
+                            database.deathTime++;
+                            database.logMessage.Print(LogMessage.closeStatus.backToCharacterSelection);
                         }
                     }
                     else

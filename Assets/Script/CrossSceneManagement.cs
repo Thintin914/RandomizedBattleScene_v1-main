@@ -73,18 +73,8 @@ public class CrossSceneManagement : MonoBehaviour
                 pointHolder.gameObject.SetActive(true);
                 if (previousSceneName == "BattleScene")
                 {
-                    if (database.allyDetails.Count == 0)
-                    {
-                        pointHolder.avaliableLevel.Clear();
-                        pointHolder.avaliableLevel.Add(0);
-                        pointHolder.beatedLevel.Clear();
-                        pointHolder.currentPoint = 0;
-                    }
-                    else
-                    {
-                        forcedThrowDice = true;
-                        pointHolder.ExpandLevel();
-                    }
+                    forcedThrowDice = true;
+                    pointHolder.ExpandLevel();
                 }
                 pointHolder.Initialize();
                 break;
@@ -113,6 +103,15 @@ public class CrossSceneManagement : MonoBehaviour
                 break;
             case "Ending":
                 pointHolder.gameObject.SetActive(false);
+                break;
+            case "SelectInitialCharacter":
+                pointHolder.gameObject.SetActive(false);
+                pointHolder.avaliableLevel.Clear();
+                pointHolder.avaliableLevel.Add(0);
+                pointHolder.beatedLevel.Clear();
+                pointHolder.currentPoint = 0;
+
+                database.AddCharacterToAllyList(database.CharacterLibrary(0));
                 break;
         }
 

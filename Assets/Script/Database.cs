@@ -5,7 +5,7 @@ using UnityEngine;
 public class Database : MonoBehaviour
 {
     public bool isHandling = true, isSelectedOption = false, isAllySelected = false;
-    [HideInInspector]public int selectedState = 0, selectedIndex = 0, selector = 0, selectedItem = 0, currentWave = 0, mapLerpingNumber = 0, totalWave = 0, level = 0, coinGainInOneRound = 0, beatCharacterSelectionIndex = 0;
+    [HideInInspector] public int selectedState = 0, selectedIndex = 0, selector = 0, selectedItem = 0, currentWave = 0, mapLerpingNumber = 0, totalWave = 0, level = 0, coinGainInOneRound = 0, beatCharacterSelectionIndex = 0, deathTime = 0;
     public int coin = 0;
     public GameObject characterData, sceneCharacter, instruction, map, log, dice, targetIcon, popText;
     public GameObject[] characterSprites;
@@ -219,8 +219,6 @@ public class Database : MonoBehaviour
     public void SetUp()
     {
         coin = 0;
-
-        AddCharacterToAllyList(CharacterLibrary(0));
     }
 
     public void CreateDice()

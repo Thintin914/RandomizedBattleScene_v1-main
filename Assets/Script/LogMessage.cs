@@ -10,7 +10,7 @@ public class LogMessage : MonoBehaviour
     public Sprite log1, log2;
     private SpriteRenderer sr;
     public bool isPrintintComplete = true, isHiding = true;
-    [HideInInspector]public enum closeStatus { backToBigMap, close, backToShop};
+    [HideInInspector]public enum closeStatus { backToBigMap, close, backToShop, backToCharacterSelection};
     private closeStatus status;
     private Transform canvasTransform;
     private TMPro.TextMeshProUGUI instructionHolder;
@@ -122,6 +122,10 @@ public class LogMessage : MonoBehaviour
                 {
                     database.transform.parent.GetComponent<CrossSceneManagement>().LoadScene("Shop");
                 }
+                else if(status == closeStatus.backToCharacterSelection)
+                {
+                    database.transform.parent.GetComponent<CrossSceneManagement>().LoadScene("SelectInitialCharacter");
+                }
             }
         }
     }
@@ -167,6 +171,8 @@ public class LogMessage : MonoBehaviour
             instructionHolder.text = "[Z] to close";
         if (status == closeStatus.backToShop)
             instructionHolder.text = "[Z] to enter shop";
+        if (status == closeStatus.backToCharacterSelection)
+            instructionHolder.text = "[Z] to restart";
         enabled = true;
     }
 }
